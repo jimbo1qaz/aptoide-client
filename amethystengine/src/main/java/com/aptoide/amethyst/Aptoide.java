@@ -74,30 +74,7 @@ public class Aptoide extends Application {
     // See SharedPreferences#registerOnSharedPreferenceChangeListener
     private SharedPreferences.OnSharedPreferenceChangeListener listener;
 
-    private void setAdvertisingIdClient() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                String aaid = "";
-                if (AptoideUtils.GoogleServices.checkGooglePlayServices(context)) {
-                    try {
-                        aaid = AdvertisingIdClient.getAdvertisingIdInfo(Aptoide.this).getId();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    byte[] data = new byte[16];
-                    String deviceId = android.provider.Settings.Secure.getString(context.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-                    SecureRandom secureRandom = new SecureRandom();
-                    secureRandom.setSeed(deviceId.hashCode());
-                    secureRandom.nextBytes(data);
-                    aaid = UUID.nameUUIDFromBytes(data).toString();
-                }
-
-                AptoideUtils.getSharedPreferences().edit().putString("advertisingIdClient", aaid).apply();
-            }
-        }).start();
-    }
+    private void setAdvertisingIdClient() {}
 
     @Override
     public void onCreate() {

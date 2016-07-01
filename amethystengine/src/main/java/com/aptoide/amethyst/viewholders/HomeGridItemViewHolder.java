@@ -49,7 +49,7 @@ public class HomeGridItemViewHolder extends BaseViewHolder {
 
         if (displayable instanceof AdItem) {
             AdItem adItem = (AdItem) displayable;
-            name.setText(adItem.appName);
+            name.setText("This should never happen.");
             downloads.setText(Aptoide.getContext().getString(R.string.sponsored));
             ratingBar.setVisibility(View.GONE);
             itemView.setOnClickListener(new BaseAdapter.AdAppItemOnClickListener(adItem));

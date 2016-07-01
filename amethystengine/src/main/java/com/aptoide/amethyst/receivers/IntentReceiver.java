@@ -191,37 +191,6 @@ public class IntentReceiver extends AptoideBaseActivity implements DialogInterfa
 
                 Log.d("AptoideAptWord", json);
 
-                ApkSuggestionJson.Ads ad = null;
-                try {
-                    ad = new ObjectMapper().readValue(json, ApkSuggestionJson.Ads.class);
-                } catch (IOException e) {
-                    Logger.printException(e);
-                }
-
-                if (ad != null) {
-                    Intent i = new Intent(this, appViewClass);
-                    long id = ad.data.id.longValue();
-                    i.putExtra(Constants.APP_ID_KEY, id);
-                    i.putExtra("packageName", ad.data.packageName);
-                    i.putExtra("repoName", ad.data.repo);
-                    i.putExtra("fromSponsored", true);
-                    i.putExtra("location", "homepage");
-                    i.putExtra("keyword", "__NULL__");
-                    i.putExtra("cpc", ad.info.cpc_url);
-                    i.putExtra("cpi", ad.info.cpi_url);
-                    i.putExtra("whereFrom", "sponsored");
-                    i.putExtra("download_from", "sponsored");
-
-                    if (ad.partner != null) {
-                        Bundle bundle = new Bundle();
-                        bundle.putString("partnerType", ad.partner.partnerInfo.name);
-                        bundle.putString("partnerClickUrl", ad.partner.partnerData.click_url);
-                        i.putExtra("partnerExtra", bundle);
-                    }
-
-                    startActivity(i);
-                }
-
                 finish();
             }
 

@@ -120,40 +120,10 @@ public abstract class BaseAdapter extends RecyclerView.Adapter<BaseViewHolder> {
 
     public static class AdAppItemOnClickListener implements View.OnClickListener {
 
-        private final AdItem adItem;
-
-        public AdAppItemOnClickListener(AdItem adItem) {
-            this.adItem = adItem;
-        }
+        public AdAppItemOnClickListener(AdItem adItem) {}
 
         @Override
-        public void onClick(View view) {
-            Intent i = new Intent(view.getContext(), AppViewActivity.class);
-            i.putExtra(Constants.FROM_SPONSORED_KEY, true);
-
-            i.putExtra(Constants.APP_ID_KEY, adItem.id);
-            i.putExtra(Constants.AD_ID_KEY, adItem.adId);
-            i.putExtra(Constants.APPNAME_KEY, adItem.appName);
-            i.putExtra(Constants.PACKAGENAME_KEY, adItem.packageName);
-            i.putExtra(Constants.STORENAME_KEY, adItem.storeName);
-            i.putExtra(Constants.CPC_KEY, adItem.cpcUrl);
-            i.putExtra(Constants.CPI_KEY, adItem.cpiUrl);
-            i.putExtra(Constants.CPD_KEY, adItem.cpdUrl);
-
-            i.putExtra(Constants.LOCATION_KEY, "homepage");
-            i.putExtra(Constants.KEYWORD_KEY, "__NULL__");
-            i.putExtra(Constants.WHERE_FROM_KEY, "sponsored");
-            i.putExtra(Constants.DOWNLOAD_FROM_KEY, "sponsored");
-
-            if (adItem.partnerName != null && adItem.partnerClickUrl != null) {
-                Bundle bundle = new Bundle();
-                bundle.putString("partnerType", adItem.partnerName);
-                bundle.putString("partnerClickUrl", adItem.partnerClickUrl);
-                i.putExtra("partnerExtra", bundle);
-            }
-
-            view.getContext().startActivity(i);
-        }
+        public void onClick(View view) {}
     }
 
     public static class TimelineItemOnClickListener implements View.OnClickListener {

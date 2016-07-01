@@ -403,48 +403,7 @@ public class MainActivity extends AptoideBaseActivity implements AddCommentVoteC
                     return true;
                 }
 
-            } else if (properties.containsKey("aptword")) {
-                String param = properties.getProperty("aptword");
-
-                if (!TextUtils.isEmpty(param)) {
-
-                    param = param.replaceAll("\\*", "_").replaceAll("\\+", "/");
-
-                    String json = new String(Base64.decode(param.getBytes(), 0));
-
-                    Log.d("AptoideAptWord", json);
-
-                    ObjectMapper mapper = new ObjectMapper();
-
-                    ApkSuggestionJson.Ads ad = mapper.readValue(json, ApkSuggestionJson.Ads.class);
-
-                    intent = new Intent(this, AppViewActivity.class);
-                    long id = ad.getData().getId().longValue();
-                    long adId = ad.getInfo().getAd_id();
-                    intent.putExtra(Constants.APP_ID_KEY, id);
-                    intent.putExtra(Constants.AD_ID_KEY, adId);
-                    intent.putExtra(Constants.PACKAGENAME_KEY, ad.getData().getPackageName());
-                    intent.putExtra(Constants.STORENAME_KEY, ad.getData().getRepo());
-                    intent.putExtra(Constants.FROM_SPONSORED_KEY, true);
-                    intent.putExtra(Constants.LOCATION_KEY, Constants.HOMEPAGE_KEY);
-                    intent.putExtra(Constants.KEYWORD_KEY, "__NULL__");
-                    intent.putExtra(Constants.CPC_KEY, ad.getInfo().getCpc_url());
-                    intent.putExtra(Constants.CPI_KEY, ad.getInfo().getCpi_url());
-                    intent.putExtra(Constants.WHERE_FROM_KEY, Constants.FROM_SPONSORED_KEY);
-                    intent.putExtra(Constants.DOWNLOAD_FROM_KEY, Constants.FROM_SPONSORED_KEY);
-
-                    if (ad.getPartner() != null) {
-                        Bundle bundle = new Bundle();
-                        bundle.putString(Constants.PARTNER_TYPE_KEY, ad.getPartner().getPartnerInfo().getName());
-                        bundle.putString(Constants.PARTNER_CLICK_URL_KEY, ad.getPartner().getPartnerData().getClick_url());
-                        intent.putExtra(Constants.PARTNER_EXTRA, bundle);
-                    }
-                    startActivityForResult(intent, WIZARD_REQ_CODE);
-
-                }
-                return true;
             }
-
 
         } catch (Exception e) {
             if (appId != null) {

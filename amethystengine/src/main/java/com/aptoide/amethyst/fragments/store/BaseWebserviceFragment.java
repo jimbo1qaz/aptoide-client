@@ -269,120 +269,9 @@ public abstract class BaseWebserviceFragment extends GridRecyclerFragment {
         }
     }
 
-    private void executeAdsSpiceRequest() {
+    private void executeAdsSpiceRequest() {}
 
-        if (sponsoredCache == null) {
-            if (args != null && args.getString("sponsoredCache") != null) {
-                sponsoredCache = args.getString("sponsoredCache");
-            } else {
-                sponsoredCache = UUID.randomUUID().toString();
-            }
-        }
-
-        final GetAdsRequest request = new GetAdsRequest();
-        request.setLimit(BUCKET_SIZE);
-        request.setLocation("homepage");
-        request.setKeyword("__NULL__");
-
-
-        // in order to present the right info on screen after a screen rotation, always pass the bucketsize as cachekey
-        spiceManager.execute(request, sponsoredCache + "--" + BUCKET_SIZE, useCache ? DurationInMillis.ONE_HOUR : DurationInMillis.ALWAYS_EXPIRED, new RequestListener<ApkSuggestionJson>() {
-            @Override
-            public void onRequestFailure(SpiceException spiceException) {
-            }
-
-            @Override
-            public void onRequestSuccess(ApkSuggestionJson apkSuggestionJson) {
-                if (apkSuggestionJson != null && apkSuggestionJson.ads != null && apkSuggestionJson.ads.size() > 0) {
-
-                    // range is the size of the list. Because the HeaderRow replaces the placeholder, it's not considered an insertion
-                    // why is this important? because of notifyItemRangeInserted
-                    int range = apkSuggestionJson.ads.size();
-                    int index = 0, originalIndex = 0;
-
-                    boolean adPlaceHolderFound = false;
-                    for (Displayable display : displayableList) {
-                        if (display instanceof AdPlaceHolderRow) {
-                            adPlaceHolderFound = true;
-                            originalIndex = index = displayableList.indexOf(display);
-                            break;
-                        }
-                    }
-
-                    // prevent multiple requests adding to beginning of the list
-                    if (!adPlaceHolderFound)
-                        return;
-
-
-                    HeaderRow header = new HeaderRow(getString(R.string.highlighted_apps), true, ADS_TYPE, BUCKET_SIZE, isHomePage(), getStoreId());
-                    displayableList.set(index++, header);
-
-                    for (int i = 0; i < apkSuggestionJson.ads.size(); i++) {
-                        ApkSuggestionJson.Ads ad = apkSuggestionJson.ads.get(i);
-
-                        AdItem adItem = getAdItem(ad);
-
-                        displayableList.add(index++, adItem);
-                    }
-
-                    adapter.notifyItemRangeInserted(originalIndex + 1, range);
-                }
-            }
-        });
-    }
-
-    private void executeReviewsSpiceRequest() {
-
-        GetReviews.GetReviewList reviewRequest = new GetReviews.GetReviewList();
-
-        reviewRequest.setOrderBy("rand");
-        reviewRequest.store_id = getStoreId();
-        reviewRequest.homePage = isHomePage();
-        reviewRequest.limit = 1;
-
-        // in order to present the right info on screen after a screen rotation, always pass the bucketsize as cachekey
-        spiceManager.execute(reviewRequest, "review-store-" + getStoreId() + "--" + BUCKET_SIZE, useCache ? DurationInMillis.ONE_HOUR : DurationInMillis.ALWAYS_EXPIRED, new RequestListener<ReviewListJson>() {
-            @Override
-            public void onRequestFailure(SpiceException spiceException) {
-            }
-
-            @Override
-            public void onRequestSuccess(ReviewListJson reviewListJson) {
-                if ("OK".equals(reviewListJson.status) && reviewListJson.reviews != null && reviewListJson.reviews.size() > 0) {
-
-                    // range is the size of the list. Because the HeaderRow replaces the placeholder, it's not considered an insertion
-                    // why is this important? because of notifyItemRangeInserted
-                    int range = reviewListJson.reviews.size();
-                    int index = 0, originalIndex = 0;
-
-                    boolean reviewPlaceHolderFound = false;
-                    for (Displayable display : displayableList) {
-                        if (display instanceof ReviewPlaceHolderRow) {
-                            reviewPlaceHolderFound = true;
-                            originalIndex = index = displayableList.indexOf(display);
-                            break;
-                        }
-                    }
-
-                    // prevent multiple requests adding to the beginning of the list
-                    if (!reviewPlaceHolderFound)
-                        return;
-
-
-                    HeaderRow header = new HeaderRow(getString(R.string.more_reviews), true, REVIEWS_TYPE, BUCKET_SIZE, isHomePage(), getStoreId());
-                    displayableList.set(index++, header);
-
-                    for (Review review : reviewListJson.reviews) {
-
-                        ReviewRowItem reviewRowItem = getReviewRow(review);
-                        displayableList.add(index++, reviewRowItem);
-                    }
-
-                    adapter.notifyItemRangeInserted(originalIndex + 1, range);
-                }
-            }
-        });
-    }
+    private void executeReviewsSpiceRequest() {}
 
 
     @Override
@@ -466,24 +355,6 @@ public abstract class BaseWebserviceFragment extends GridRecyclerFragment {
         reviewRowItem.rating = review.average.floatValue();
         reviewRowItem.reviewId = review.id;
         return reviewRowItem;
-    }
-
-    @NonNull
-    protected AdItem getAdItem(ApkSuggestionJson.Ads ad) {
-        AdItem adItem = new AdItem(BUCKET_SIZE);
-        adItem.setSpanSize(2);
-        adItem.appName = ad.data.name;
-        adItem.icon = ad.data.icon;
-        adItem.packageName = ad.data.packageName;
-        adItem.storeName = ad.data.repo;
-        adItem.id = ad.data.id.longValue();
-        adItem.adId = ad.info.ad_id;
-        adItem.cpcUrl = ad.info.cpc_url;
-        adItem.cpiUrl = ad.info.cpi_url;
-        adItem.cpdUrl = ad.info.cpd_url;
-        adItem.partnerName = ad.partner != null ? ad.partner.partnerInfo.name : null;
-        adItem.partnerClickUrl = ad.partner != null ? ad.partner.partnerData.click_url : null;
-        return adItem;
     }
 
     @NonNull

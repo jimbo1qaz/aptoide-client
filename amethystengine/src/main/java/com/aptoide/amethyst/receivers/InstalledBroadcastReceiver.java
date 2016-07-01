@@ -64,13 +64,7 @@ public class InstalledBroadcastReceiver extends BroadcastReceiver {
         }
     }
 
-    private void tryToReferrer(final Context context, final String packageName, String location) {
-        Logger.d("InstalledBroadcastReceiver", "try to referrer " + packageName + " from " + location);
-
-        // TODO: Este simplefuture não faz falta aqui, para futura refactorização.
-        spiceManager.execute(GetAdsRequest.newDefaultRequest(location, packageName), GetAdsRequestListener.withBroadcast(context, packageName, spiceManager,
-                new SimpleFuture<String>(), 2));
-    };
+    private void tryToReferrer(final Context context, final String packageName, String location) {};
     ;
 
     private boolean assertNotNull(Object... objects) {
@@ -189,46 +183,7 @@ public class InstalledBroadcastReceiver extends BroadcastReceiver {
         return control;
     }
 
-    private void processAbTesting(Context context, PackageManager mPm, String installEvent, AptoideDatabase db) {
-        try {
-//            System.out.println("Debug: AB Testing: " + intent.getData().getEncodedSchemeSpecificPart());
-            final PackageInfo pkg = mPm.getPackageInfo(installEvent, PackageManager.GET_SIGNATURES);
-//            System.out.println("Debug: AB Testing: " + pkg.packageName);
-//            System.out.println("Debug: AB Testing: " + db.isAmazonABTesting(pkg.packageName));
-
-            if (db.isAmazonABTesting(pkg.packageName)) {
-                InsightsCredentials credentials = AmazonInsights.newCredentials(BuildConfig.AMAZON_PUBLIC_KEY, BuildConfig.AMAZON_PRIVATE_KEY);
-                AmazonInsights insightsInstance = AmazonInsights.newInstance(credentials, context.getApplicationContext());
-                EventClient eventClient = insightsInstance.getEventClient();
-                eventClient = AppViewMiddleSuggested.eventClient;
-
-                // Create an event Event
-                Event installedApplication = eventClient.createEvent("Application Installed");
-
-                // Record an event
-                eventClient.recordEvent(installedApplication);
-                eventClient.submitEvents();
-
-                final EventClient finalEventClient = eventClient;
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            // Intervalo minimo entre pedidos amazon :/
-                            Thread.sleep(61000);
-                            finalEventClient.submitEvents();
-                        } catch (Exception e) {
-                        }
-                    }
-                }).start();
-
-                db.deleteAmazomABTesting(pkg.packageName);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
+    private void processAbTesting(Context context, PackageManager mPm, String installEvent, AptoideDatabase db) {}
 
 
     /**

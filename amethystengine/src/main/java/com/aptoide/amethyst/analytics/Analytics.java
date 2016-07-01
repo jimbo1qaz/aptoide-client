@@ -12,8 +12,6 @@ import com.aptoide.amethyst.downloadmanager.model.Download;
 import com.aptoide.amethyst.preferences.EnumPreferences;
 import com.aptoide.amethyst.utils.AptoideUtils;
 import com.aptoide.amethyst.utils.Logger;
-import com.flurry.android.FlurryAgent;
-import com.localytics.android.Localytics;
 
 import java.util.HashMap;
 
@@ -43,57 +41,11 @@ public class Analytics {
         return (flag & accepted) == accepted;
     }
 
-    private static void track(String event, String key, String attr, int flags) {
+    private static void track(String event, String key, String attr, int flags) {}
 
-        try {
-            if (!ACTIVATE)
-                return;
+    private static void track(String event, HashMap map, int flags) {}
 
-            HashMap stringObjectHashMap = new HashMap<>();
-
-            stringObjectHashMap.put(key, attr);
-
-            track(event, stringObjectHashMap, flags);
-
-            Logger.d("Analytics", "Event: " + event + ", Key: " + key + ", attr: " + attr);
-
-        } catch (Exception e) {
-            Log.d("Analytics", e.getStackTrace().toString());
-        }
-
-    }
-
-    private static void track(String event, HashMap map, int flags) {
-        try {
-            if (!ACTIVATE)
-                return;
-
-            if(checkAcceptability(flags, LOCALYTICS))
-                Localytics.tagEvent(event, map);
-
-            Logger.d("Analytics", "Event: " + event + ", Map: " + map);
-
-        } catch (Exception e) {
-            Log.d("Analytics", e.getStackTrace().toString());
-        }
-    }
-
-    private static void track(String event, int flags) {
-
-        try {
-            if (!ACTIVATE)
-                return;
-
-            if(checkAcceptability(flags, LOCALYTICS))
-                Localytics.tagEvent(event);
-
-            Logger.d("Analytics", "Event: " + event);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
+    private static void track(String event, int flags) {}
 
     public static class Lifecycle {
 
@@ -104,7 +56,6 @@ public class Analytics {
                     return;
 
                 // Integrate Localytics
-                Localytics.integrate(context);
 
             }
         }
@@ -131,28 +82,6 @@ public class Analytics {
                     return;
 
                 // Localytics
-                Localytics.openSession();
-                Localytics.upload();
-
-                if (!AptoideUtils.AccountUtils.isLoggedIn(activity)) {
-                    Localytics.setCustomDimension(0, "Not Logged In");
-                } else {
-                    Localytics.setCustomDimension(0, "Logged In");
-                }
-
-                String cpuid = PreferenceManager.getDefaultSharedPreferences(Aptoide.getContext()).getString(EnumPreferences.APTOIDE_CLIENT_UUID.name(), "NoInfo");
-
-                Localytics.setCustomerId(cpuid);
-
-                if (screenName != null) {
-                    Localytics.tagScreen(screenName);
-                }
-
-                Localytics.handleTestMode(activity.getIntent());
-
-                Logger.d("Analytics", "Event: CPU_ID: " + cpuid);
-                Logger.d("Analytics", "Screen: " + screenName);
-
             }
 
             public static void onPause(android.app.Activity activity) {
@@ -161,8 +90,6 @@ public class Analytics {
                     return;
 
                 // Localytics
-                Localytics.closeSession();
-                Localytics.upload();
             }
 
             public static void onStart(android.app.Activity activity) {
@@ -170,7 +97,6 @@ public class Analytics {
                 if (!ACTIVATE)
                     return;
 
-                FlurryAgent.onStartSession(activity, BuildConfig.FLURRY_KEY);
 
             }
 
@@ -179,7 +105,6 @@ public class Analytics {
                 if (!ACTIVATE)
                     return;
 
-                FlurryAgent.onEndSession(activity);
 
             }
         }
@@ -195,8 +120,6 @@ public class Analytics {
 
             Logger.d("Analytics", "Localytics: Screens: " + screenName);
 
-            Localytics.tagScreen(screenName);
-            Localytics.upload();
         }
     }
 
@@ -224,8 +147,6 @@ public class Analytics {
 
             try {
                 // TODO: Change to setCustomerId
-                Localytics.setCustomerId(username);
-
                 track(EVENT_NAME, ACTION, mode.toString(), ALL);
             } catch (NullPointerException e) {
                 e.printStackTrace();
@@ -522,25 +443,7 @@ public class Analytics {
         private static final String INSTALLED = "Installed";
         private static final String DOWNGRADED_ROLLBACK = "Downgraded Rollback";
 
-        private static void innerTrack(String packageName, String type,@Nullable Boolean referred, int flags) {
-            try {
-                HashMap<String, String> stringObjectHashMap = new HashMap<>();
-
-                stringObjectHashMap.put(TYPE, type);
-                stringObjectHashMap.put(PACKAGE_NAME, packageName);
-
-                if (referred != null) {
-                    stringObjectHashMap.put(REFERRED, referred.toString());
-                } else {
-                    stringObjectHashMap.put(REFERRED, new Boolean(false).toString());
-                }
-
-                track(EVENT_NAME, stringObjectHashMap, flags);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        private static void innerTrack(String packageName, String type,@Nullable Boolean referred, int flags) {}
 
         public static void installed(String packageName, boolean referred) {
             innerTrack(packageName, INSTALLED, referred, ALL);
@@ -760,7 +663,6 @@ public class Analytics {
 
             Logger.d("Analytics", "Dimension: " + i + ", Value: " + s);
 
-            Localytics.setCustomDimension(i, s);
         }
 
         public static void setPartnerDimension(String partner) {
@@ -793,25 +695,6 @@ public class Analytics {
             ltv("App Purchase", packageName, revenue);
         }
 
-        private static void ltv(String eventName, String packageName, double revenue) {
-            if (!ACTIVATE) {
-                return;
-            }
-
-            try {
-                HashMap<String, String> map = new HashMap<>();
-
-                Double revenueDouble = Double.valueOf(revenue);
-                Long value = revenueDouble.longValue();
-
-                map.put("packageName", packageName);
-
-                Logger.d("Analytics", "LTV: " + eventName + ": " + packageName + ", " + value);
-
-                Localytics.tagEvent(eventName, map, value);
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-            }
-        }
+        private static void ltv(String eventName, String packageName, double revenue) {}
     }
 }

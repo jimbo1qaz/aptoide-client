@@ -616,12 +616,7 @@ public class AptoideUtils {
 
             SharedPreferences sPref = PreferenceManager.getDefaultSharedPreferences(Aptoide.getContext());
 
-            user_id = sPref.getString("advertisingIdClient", null);
-
-            // Fallback para user
-            if (isNullOrEmpty(user_id)) {
-                user_id = android.provider.Settings.Secure.getString(Aptoide.getContext().getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-            }
+            user_id = null;
 
             // Fallback para UUID
             if (isNullOrEmpty(user_id)) {
@@ -1955,71 +1950,18 @@ public class AptoideUtils {
     public static class AdNetworks {
 
         public static String parseString(Context context, String clickUrl) throws IOException, GooglePlayServicesNotAvailableException, GooglePlayServicesRepairableException {
-
-            String deviceId = android.provider.Settings.Secure.getString(Aptoide.getContext().getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-            String myid = PreferenceManager.getDefaultSharedPreferences(context).getString(EnumPreferences.APTOIDE_CLIENT_UUID.name(), "NoInfo");
-
-            if (deviceId != null) {
-                clickUrl = clickUrl.replace("[USER_ANDROID_ID]", deviceId);
-            }
-
-            if (myid != null) {
-                clickUrl = clickUrl.replace("[USER_UDID]", myid);
-            }
-
-            clickUrl = replaceAdvertisementId(clickUrl, context);
-            clickUrl = clickUrl.replace("[TIME_STAMP]", String.valueOf(new Date().getTime()));
-
-            return clickUrl;
+            return "fuck parseString";
         }
 
-        private static String replaceAdvertisementId(String clickUrl, Context context) throws IOException, GooglePlayServicesNotAvailableException, GooglePlayServicesRepairableException {
-
-            String aaId = "";
-            if (GoogleServices.checkGooglePlayServices(context)) {
-                if (AptoideUtils.getSharedPreferences().contains("advertisingIdClient")) {
-                    aaId = AptoideUtils.getSharedPreferences().getString("advertisingIdClient", "");
-                } else {
-                    try {
-                        aaId = AdvertisingIdClient.getAdvertisingIdInfo(context).getId();
-                    } catch (Exception e) {
-                        // In case we try to do this from a Broadcast Receiver, exception will be thrown.
-                        Logger.w("AptoideUtils", e.getMessage());
-                    }
-                }
-            } else {
-                byte[] data = new byte[16];
-                String deviceId = android.provider.Settings.Secure.getString(context.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-                SecureRandom secureRandom = new SecureRandom();
-                secureRandom.setSeed(deviceId.hashCode());
-                secureRandom.nextBytes(data);
-                aaId = UUID.nameUUIDFromBytes(data).toString();
-            }
-
-            clickUrl = clickUrl.replace("[USER_AAID]", aaId);
-
-            return clickUrl;
+        private static String replaceAdvertisementId(String clickUrl, Context context) {
+            return "fuck replaceAdvertisementId";
         }
 
         /**
          * Execute a simple request (knock at the door) to the given URL.
          * @param url
          */
-        public static void knock(String url) {
-            OkHttpClient client = new OkHttpClient();
-
-            Request click = new Request.Builder().url(url).build();
-
-            client.newCall(click).enqueue(new Callback() {
-                @Override
-                public void onFailure(Request request, IOException e) {
-                }
-
-                @Override
-                public void onResponse(Response response) throws IOException {
-                }
-            });
-        }
+        public static void knock(String url) {}
 
     }
 

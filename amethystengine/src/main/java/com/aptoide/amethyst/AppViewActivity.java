@@ -590,12 +590,6 @@ public class AppViewActivity extends AptoideBaseActivity implements AddCommentVo
                     showDialogIfComingFromAPKFY();
                     populateRatings(model.getApp);
 
-                    if (!fromSponsored) {
-                        new AppViewMiddleSuggested((AppViewActivity) getActivity(), getView().findViewById(R.id.middleAppViewContainer), spiceManager, appId, packageName, model
-                                .getApp.nodes.meta.data.media.keywords);
-                        getOrganicAds();
-                    }
-
                     if (isFromActivityResult || forceAutoDownload) {
                         download();
                     }
@@ -1662,88 +1656,7 @@ public class AppViewActivity extends AptoideBaseActivity implements AddCommentVo
             extended = !extended;
         }
 
-        private void getOrganicAds() {
-            if (lifecycleController) {
-                return;
-            }
-
-            final GetAdsRequest getAdsRequest = new GetAdsRequest("", false);
-
-            getAdsRequest.setLocation("appview");
-            getAdsRequest.setKeyword("__NULL__");
-            getAdsRequest.setRepo(storeName);
-            getAdsRequest.setPackage_name(packageName);
-            getAdsRequest.setLimit(1);
-            getAdsRequest.setRetryPolicy(new RetryPolicy() {
-                @Override
-                public int getRetryCount() {
-                    return 0;
-                }
-
-                @Override
-                public void retry(SpiceException e) {
-                }
-
-                @Override
-                public long getDelayBeforeRetry() {
-                    return 0;
-                }
-            });
-            getAdsRequest.setTimeout(2000);
-
-            spiceManager.execute(getAdsRequest, new RequestListener<ApkSuggestionJson>() {
-                @Override
-                public void onRequestFailure(SpiceException spiceException) {
-                }
-
-                @Override
-                public void onRequestSuccess(ApkSuggestionJson apkSuggestionJson) {
-                    try {
-
-                        ApkSuggestionJson.Ads appSuggested = apkSuggestionJson.getAds().get(0);
-
-                        if (apkSuggestionJson.getAds().size() == 0) {
-                            return;
-                        }
-                        if (appSuggested.getPartner() == null) {
-                            return;
-                        }
-                        if (appSuggested.getPartner().getPartnerData() == null) {
-                            return;
-                        }
-
-                        appSuggested = apkSuggestionJson.getAds().get(0);
-
-                        String clickUrl = appSuggested.getPartner().getPartnerData().getClick_url();
-                        final String adPackageName = appSuggested.getData().getPackageName();
-                        long id = appSuggested.getData().getId().longValue();
-                        adId = appSuggested.getInfo().getAd_id();
-
-                        ReferrerUtils.extractReferrer(packageName, appId, adId, -1, clickUrl, spiceManager, null, ReferrerUtils.RETRIES);
-
-                        OkHttpClient client = new OkHttpClient();
-
-                        Request cpc_click = new Request.Builder().url(appSuggested.getInfo().getCpc_url()).build();
-
-                        client.newCall(cpc_click).enqueue(new Callback() {
-                            @Override
-                            public void onFailure(Request request, IOException e) {
-                            }
-
-                            @Override
-                            public void onResponse(Response response) throws IOException {
-                            }
-                        });
-
-                        Intent intent = getActivity().getIntent();
-                        intent.putExtra("cpi", appSuggested.getInfo().getCpi_url());
-                        getActivity().setIntent(intent);
-                    } catch (Exception e) {
-                        Logger.printException(e);
-                    }
-                }
-            });
-        }
+        private void getOrganicAds() {}
 
         @Subscribe
         public void refreshStoresEvent(OttoEvents.RepoAddedEvent event) {
@@ -2172,29 +2085,9 @@ public class AppViewActivity extends AptoideBaseActivity implements AddCommentVo
                 versionName = intent.getStringExtra(Constants.VERSIONNAME_KEY);
 
                 executeSpiceRequestWithAppId(appId, storeName, packageName);
-            } else if (intent.getBooleanExtra(Constants.FROM_SPONSORED_KEY, false)) {
-                fromSponsored = true;
-                appId = intent.getLongExtra(Constants.APP_ID_KEY, -1);
-                adId = intent.getLongExtra(Constants.AD_ID_KEY, -1);
-                packageName = intent.getStringExtra(Constants.PACKAGENAME_KEY);
-                storeName = intent.getStringExtra(Constants.STORENAME_KEY);
-                appName = intent.getStringExtra(Constants.APPNAME_KEY);
-                String location = intent.getStringExtra(Constants.LOCATION_KEY);
-                String keyword = intent.getStringExtra(Constants.KEYWORD_KEY);
-                String cpc = intent.getStringExtra(Constants.CPC_KEY);
-                String cpi = intent.getStringExtra(Constants.CPI_KEY);
-                cpd = intent.getStringExtra(Constants.CPD_KEY);
-                String whereFrom = intent.getStringExtra(Constants.WHERE_FROM_KEY);
-                download_from = intent.getStringExtra(Constants.DOWNLOAD_FROM_KEY);
+            } else if (intent.getBooleanExtra(Constants.FROM_SPONSORED_KEY, false)) {}
 
-                executeSpiceRequestWithAppId(appId, storeName, packageName);
-                AptoideUtils.AdNetworks.knock(cpc);
-
-                if (intent.hasExtra("partnerExtra")) {
-                    final String clickUrl = intent.getBundleExtra("partnerExtra").getString("partnerClickUrl");
-                    ReferrerUtils.extractReferrer(packageName, appId, adId, -1, clickUrl, spiceManager, null, ReferrerUtils.RETRIES);
-                }
-            } else if (intent.getBooleanExtra(Constants.ROLLBACK_FROM_KEY, false)) {
+            else if (intent.getBooleanExtra(Constants.ROLLBACK_FROM_KEY, false)) {
                 md5sum = intent.getStringExtra(Constants.MD5SUM_KEY);
 
                 executeSpiceRequestWithMd5(md5sum, storeName);

@@ -233,12 +233,7 @@ public class UpdatesService extends Service {
         }
 
         private String getAdvertisementId() {
-            try {
-                return AdvertisingIdClient.getAdvertisingIdInfo(Aptoide.getContext()).getId();
-            } catch (IOException | GooglePlayServicesNotAvailableException | GooglePlayServicesRepairableException e) {
-                Logger.printException(e);
-            }
-            return null;
+            return "fuck getAdvertisementId";
         }
     }
 

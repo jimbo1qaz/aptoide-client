@@ -203,34 +203,7 @@ public class SearchFragment extends LinearRecyclerFragment {
         }
 
         @Override
-        public void onRequestSuccess(ApkSuggestionJson apkSuggestionJson) {
-
-            if (apkSuggestionJson.getAds().size() == 0) {
-                return;
-            }
-            if (apkSuggestionJson.getAds().get(0).getPartner() == null) {
-                return;
-            }
-            if (apkSuggestionJson.getAds().get(0).getPartner().getPartnerData() == null) {
-                return;
-            }
-
-            String name = apkSuggestionJson.getAds().get(0).getData().name;
-            float size = apkSuggestionJson.getAds().get(0).getData().size.floatValue() / 1024 / 1024;
-            String description = apkSuggestionJson.getAds().get(0).getData().description;
-            float rating = apkSuggestionJson.getAds().get(0).getData().stars.floatValue();
-            String iconPath = apkSuggestionJson.getAds().get(0).getData().icon;
-
-//            SuggestedAppDisplayable suggestedAppDisplayable = new SuggestedAppDisplayable(3, name, size, description, rating, iconPath);
-            HeaderRow suggestedAppHeader = new HeaderRow("Suggested App", false, BUCKET_SIZE);
-            displayables.add(0, suggestedAppHeader);
-            SuggestedAppDisplayable suggestedAppDisplayable = new SuggestedAppDisplayable(apkSuggestionJson);
-            displayables.add(1, suggestedAppDisplayable);
-
-            adapter.notifyDataSetChanged();
-//            swipeContainer.setEnabled(false);
-//            progressBar.setVisibility(View.GONE);
-        }
+        public void onRequestSuccess(ApkSuggestionJson apkSuggestionJson) {}
     };
 
     @Override

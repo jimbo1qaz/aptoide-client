@@ -31,35 +31,7 @@ public class GetAdsRequestListener {
 			}
 
 			@Override
-			public void onRequestSuccess(ApkSuggestionJson apkSuggestionJson) {
-
-				try {
-					if (apkSuggestionJson.getAds().size() > 0) {
-						ApkSuggestionJson.Ads ad = apkSuggestionJson.getAds().get(0);
-
-						ReferrerUtils.extractReferrer(ad, spiceManager, simpleFuture, tries);
-
-						AptoideUtils.AdNetworks.knock(ad.getInfo().getCpc_url());
-						AptoideUtils.AdNetworks.knock(ad.getInfo().getCpi_url());
-						AptoideUtils.AdNetworks.knock(ad.getInfo().getCpd_url());
-
-						AptoideExecutors.getCachedThreadPool().execute(new Runnable() {
-							@Override
-							public void run() {
-								final String referrer = simpleFuture.get();
-
-								if (!TextUtils.isEmpty(referrer)) {
-									ReferrerUtils.broadcastReferrer(context, packageName, referrer);
-								}
-							}
-						});
-					} else {
-						ReferrerUtils.excludedCampaings.remove(packageName);
-					}
-				} catch (NullPointerException e) {
-					// Propositadamente ignorado.
-				}
-			}
+			public void onRequestSuccess(ApkSuggestionJson apkSuggestionJson) {}
 		};
 	}
 }
